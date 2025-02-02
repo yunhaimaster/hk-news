@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港新聞</title>
+    <style>
+        @property --gradient-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --accent-primary: #00ffa3;
+            --accent-secondary: #00d4ff;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradient-rotation {
+            0% { --gradient-angle: 0deg; }
+            100% { --gradient-angle: 360deg; }
+        }
+
+        body {
+            font-family: -apple-system, "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background: linear-gradient(
+                var(--gradient-angle),
+                var(--bg-primary),
+                var(--bg-secondary),
+                var(--bg-primary)
+            );
+            animation: gradient-rotation 20s linear infinite;
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+        }
+
+        header {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .categories {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding: 0 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .category.active {
+            background: linear-gradient(
+                45deg,
+                var(--accent-primary),
+                var(--accent-secondary)
+            );
+            border-color: transparent;
+            color: var(--bg-primary);
+            font-weight: 500;
+        }
+
+        .category:not(.active):hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--accent-primary),
+                var(--accent-secondary),
+                transparent
+            );
+        }
+
+        h1 {
+            font-size: 32px;
+            background: linear-gradient(
+                45deg,
+                var(--accent-primary),
+                var(--accent-secondary)
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        #last-update {
+            font-size: 14px;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        .news-container {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .news-item {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--card-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .news-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                var(--accent-primary),
+                var(--accent-secondary),
+                transparent
+            );
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .news-item:hover {
+            transform: translateY(-4px);
+            border-color: transparent;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.1),
+                0 1px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-item:hover::before {
+            transform: translateY(0);
+        }
+
+        .news-item h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .news-item p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .news-item .source {
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .news-item a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .news-item a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--accent-primary);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+
+        .news-item a:hover {
+            color: var(--accent-secondary);
+        }
+
+        .news-item a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 18px;
+            color: var(--text-secondary);
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+        }
+
+        .error {
+            background: rgba(255, 59, 48, 0.1);
+            color: #ff3b30;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .news-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>香港最新新聞</h1>
+                <div id="last-update"></div>
+            </div>
+            <div class="categories">
+                <div class="category active" data-category="熱門">熱門新聞</div>
+                <div class="category" data-category="科技">科技</div>
+                <div class="category" data-category="娛樂">娛樂</div>
+                <div class="category" data-category="商業">商業</div>
+                <div class="category" data-category="體育">體育</div>
+                <div class="category" data-category="生活">生活</div>
+            </div>
+        </header>
+        <div id="news-container" class="news-container">
+            <div class="loading">載入中...</div>
+        </div>
+    </div>
+
+    <script>
+        const newsContainer = document.getElementById('news-container');
+        const lastUpdateElement = document.getElementById('last-update');
+        
+        let currentCategory = '熱門';
+
+        async function fetchNews() {
+            try {
+                // Construct the query based on category
+                const query = currentCategory === '熱門' 
+                    ? 'Hong Kong'
+                    : `Hong Kong ${currentCategory}`;
+
+                const response = await fetch('https://api.allorigins.win/get?url=' + 
+                    encodeURIComponent('https://newsapi.org/v2/everything?' + 
+                        new URLSearchParams({
+                            q: query,
+                            language: 'zh',
+                            sortBy: 'publishedAt',
+                            pageSize: 12,
+                            apiKey: '12d6eec96dbc482785989e57cef3e976'
+                        }).toString()
+                    )
+                );
+                
+                if (!response.ok) {
+                    throw new Error('網絡請求失敗');
+                }
+                
+                const rawData = await response.json();
+                if (!rawData.contents) {
+                    throw new Error('無法獲取新聞內容');
+                }
+                
+                const data = JSON.parse(rawData.contents);
+                if (data.status === 'error') {
+                    throw new Error(data.message || '新聞API錯誤');
+                }
+                
+                if (!data.articles || data.articles.length === 0) {
+                    throw new Error('沒有找到相關新聞');
+                }
+                
+                return data.articles;
+            } catch (error) {
+                console.error('Error details:', error);
+                throw new Error(`新聞獲取失敗: ${error.message}`);
+            }
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            lastUpdateElement.textContent = `最後更新: ${now.toLocaleString('zh-HK')}`;
+        }
+
+        function displayNews(articles) {
+            if (!articles || articles.length === 0) {
+                newsContainer.innerHTML = '<div class="error">暫時沒有可用的新聞</div>';
+                return;
+            }
+
+            newsContainer.innerHTML = articles.map(article => `
+                <div class="news-item">
+                    <h2>${article.title}</h2>
+                    ${article.description ? `<p>${article.description}</p>` : ''}
+                    <div class="source">
+                        來源: ${article.source.name || '未知'} | 
+                        <a href="${article.url}" target="_blank" rel="noopener noreferrer">閱讀更多</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateNews() {
+            try {
+                const articles = await fetchNews();
+                displayNews(articles);
+                updateLastUpdateTime();
+            } catch (error) {
+                newsContainer.innerHTML = `<div class="error">${error.message}</div>`;
+            }
+        }
+
+        // Category selection
+        document.querySelector('.categories').addEventListener('click', async (e) => {
+            const categoryEl = e.target.closest('.category');
+            if (!categoryEl || categoryEl.classList.contains('active')) return;
+
+            // Update active state
+            document.querySelector('.category.active').classList.remove('active');
+            categoryEl.classList.add('active');
+
+            // Update category and fetch news
+            currentCategory = categoryEl.dataset.category;
+            newsContainer.innerHTML = '<div class="loading">載入中...</div>';
+            await updateNews();
+        });
+
+        // Initial load
+        updateNews();
+
+        // Update every hour
+        setInterval(updateNews, 3600000);
+
+        // Add smooth scroll for categories
+        const categoriesContainer = document.querySelector('.categories');
+        let isScrolling = false;
+
+        categoriesContainer.addEventListener('wheel', (e) => {
+            if (!isScrolling) {
+                requestAnimationFrame(() => {
+                    categoriesContainer.scrollLeft += e.deltaY;
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>
