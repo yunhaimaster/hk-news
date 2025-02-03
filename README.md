@@ -1,21 +1,32 @@
-# Hong Kong News Viewer
+# Hong Kong News Dashboard
 
-A modern news aggregator for Hong Kong news with category filtering and auto-updates.
+A modern, Apple-inspired news aggregator for Hong Kong news featuring a sleek dark theme and minimalist design.
+
+## Features
+
+- 🎨 Apple-inspired design system
+- 🌙 Elegant dark mode interface
+- 🔄 Real-time news updates
+- 📱 Responsive layout
+- 🎯 Category filtering
+- ✨ Smooth animations and transitions
+- 🎭 Glass-morphism effects
+
+## Design Elements
+
+- **Typography**: Uses SF Pro Display for authentic Apple aesthetics
+- **Color Scheme**: Dark theme with high contrast and Apple's signature blue accents
+- **UI Components**: Rounded cards, pill-shaped buttons, and minimal borders
+- **Animations**: Subtle hover effects and smooth transitions
+- **Layout**: Clean, centered content with ample whitespace
 
 ## Quick Start
 
 1. Clone this repository
-2. Open `news.html` in your browser
+2. Open `index.html` in your browser
 3. Or scan this QR code to view on mobile:
 
 ![QR Code](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YOUR_DEPLOYED_URL)
-
-## Features
-
-- 🔄 Auto-updates every hour
-- 📱 Responsive design
-- 🎯 Category filtering
-- 🌙 Modern dark mode interface
 
 ## Hosting Options
 
@@ -36,6 +47,14 @@ A modern news aggregator for Hong Kong news with category filtering and auto-upd
    - Netlify (Free)
    - Vercel (Free)
    - Any static web hosting service
+
+## Development
+
+The project uses modern web technologies:
+- HTML5 for structure
+- CSS3 with modern features like CSS variables and glass-morphism effects
+- Vanilla JavaScript for functionality
+- NewsAPI for content delivery
 
 ## Note
 
