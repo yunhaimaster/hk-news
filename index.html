@@ -3,419 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas-Style News Dashboard</title>
+    <title>香港新聞 - Apple Style News Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        @property --gradient-angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f8f9fa;
-            --accent-primary: #0066ff;
-            --accent-secondary: #3385ff;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --card-bg: #ffffff;
-            --card-border: #e6e6e6;
-            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            --nav-bg: rgba(255, 255, 255, 0.8);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        @keyframes gradient-rotation {
-            0% { --gradient-angle: 0deg; }
-            100% { --gradient-angle: 360deg; }
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, "Microsoft JhengHei", "微軟正黑體", sans-serif;
-            background: var(--bg-secondary);
-            background-image:
-                radial-gradient(circle at 100% 0%, rgba(0, 102, 255, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(0, 102, 255, 0.03) 0%, transparent 50%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 1rem;
-        }
-
-        .dashboard-card {
-            position: relative;
-            overflow: hidden;
-            padding: 2rem;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow:
-                0 4px 20px rgba(0, 0, 0, 0.05),
-                0 0 0 1px var(--card-border);
-        }
-
-        .dashboard-card::before,
-        .dashboard-card::after {
-            content: '';
-            position: absolute;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            opacity: 0.05;
-            z-index: 0;
-        }
-
-        .dashboard-card::before {
-            width: 300px;
-            height: 300px;
-            top: -150px;
-            right: -150px;
-        }
-
-        .dashboard-card::after {
-            width: 200px;
-            height: 200px;
-            bottom: -100px;
-            left: -100px;
-        }
-
-        .dashboard-header,
-        .categories,
-        .news-grid {
-            position: relative;
-            z-index: 1;
-        }
-
-        .global-nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--nav-bg);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--card-border);
-            z-index: 1000;
-            padding: 1rem 2rem;
-        }
-
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--card-border);
-        }
-
-        header {
-            margin-bottom: 40px;
-            position: relative;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--card-border);
-        }
-
-        .categories {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            padding: 0.5rem;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            background: var(--bg-secondary);
-            border-radius: 30px;
-            position: relative;
-        }
-
-        .categories::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, var(--bg-secondary));
-            pointer-events: none;
-        }
-
-        .categories::-webkit-scrollbar {
-            display: none;
-        }
-
-        .nav-link {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            background: var(--bg-secondary);
-            border: none;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .nav-link.active {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .nav-link:not(.active):hover {
-            background: var(--bg-primary);
-            color: var(--accent-primary);
-        }
-
-        header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                var(--accent-primary),
-                var(--accent-secondary),
-                transparent
-            );
-        }
-
-        .dashboard-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(
-                135deg,
-                var(--text-primary) 0%,
-                var(--accent-primary) 50%,
-                var(--accent-secondary) 100%
-            );
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            position: relative;
-            display: inline-block;
-            margin-bottom: 0.5rem;
-        }
-
-        .dashboard-title::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 40%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), transparent);
-            border-radius: 2px;
-        }
-
-        #last-update {
-            font-size: 14px;
-            color: var(--text-secondary);
-            background: var(--card-bg);
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid var(--card-border);
-        }
-
-        .news-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        }
-
-        .news-item {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid var(--card-border);
-            transition: all 0.3s ease;
-            box-shadow: var(--card-shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .news-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .news-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .news-item:hover::before {
-            opacity: 1;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        .loading {
-            background: linear-gradient(
-                90deg,
-                var(--bg-secondary),
-                var(--card-bg),
-                var(--bg-secondary)
-            );
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite linear;
-        }
-
-        .news-item:hover::before {
-            transform: translateY(0);
-        }
-
-        .news-item h2 {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-            line-height: 1.4;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-        }
-
-        .news-item p {
-            font-size: 0.9375rem;
-            color: var(--text-secondary);
-            margin-bottom: 1.25rem;
-            line-height: 1.6;
-            letter-spacing: -0.1px;
-        }
-
-        .news-item .source {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .news-item a {
-            color: var(--accent-primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-            position: relative;
-        }
-
-        .news-item a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: var(--accent-primary);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease;
-        }
-
-        .news-item a:hover {
-            color: var(--accent-secondary);
-        }
-
-        .news-item a:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 3rem;
-            color: var(--text-secondary);
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .loading::before {
-            content: '';
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid var(--accent-primary);
-            border-right-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .error {
-            background: #fff2f2;
-            color: #ff4444;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 1rem 0;
-            text-align: center;
-            border: 1px solid #ffe6e6;
-            font-size: 0.875rem;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .dashboard-card {
-                padding: 1.5rem;
-            }
-
-            .dashboard-title {
-                font-size: 1.5rem;
-            }
-
-            .news-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <main class="main-content">
         <div class="dashboard-card">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">香港最新消息</h1>
-                <div id="last-update" style="color: var(--text-secondary); font-size: 0.875rem; background: var(--bg-secondary); padding: 0.5rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;"></div>
+                <div id="last-update"></div>
             </div>
             
-            <div class="categories" style="margin-bottom: 1.5rem;">
+            <div class="categories">
                 <button class="nav-link active" data-category="熱門">全部新聞</button>
                 <button class="nav-link" data-category="科技">科技新聞</button>
                 <button class="nav-link" data-category="商業">商業新聞</button>
@@ -436,7 +36,6 @@
 
         async function fetchNews() {
             try {
-                // Construct the query based on category
                 const query = currentCategory === '熱門' 
                     ? 'Hong Kong'
                     : `Hong Kong ${currentCategory}`;
@@ -494,7 +93,7 @@
                     <h2>${article.title}</h2>
                     ${article.description ? `<p>${article.description}</p>` : ''}
                     <div class="source">
-                        來源:${article.source.name || '未知'} |
+                        來源: ${article.source.name || '未知'} |
                         <a href="${article.url}" target="_blank" rel="noopener noreferrer">查看完整內容</a>
                     </div>
                 </div>
@@ -503,6 +102,7 @@
 
         async function updateNews() {
             try {
+                newsContainer.innerHTML = '<div class="loading">載入中...</div>';
                 const articles = await fetchNews();
                 displayNews(articles);
                 updateLastUpdateTime();
@@ -516,13 +116,10 @@
             const button = e.target.closest('.nav-link');
             if (!button || button.classList.contains('active')) return;
 
-            // Update active state
             document.querySelector('.nav-link.active').classList.remove('active');
             button.classList.add('active');
 
-            // Update category and fetch news
             currentCategory = button.dataset.category;
-            newsContainer.innerHTML = '<div class="loading">載入中...</div>';
             await updateNews();
         });
 
