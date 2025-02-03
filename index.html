@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港新聞</title>
+    <title>Canvas-Style News Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <style>
         @property --gradient-angle {
             syntax: '<angle>';
@@ -12,14 +14,16 @@
         }
 
         :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #1a1a1a;
-            --accent-primary: #00ffa3;
-            --accent-secondary: #00d4ff;
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --card-border: rgba(255, 255, 255, 0.05);
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --accent-primary: #0066ff;
+            --accent-secondary: #3385ff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --card-bg: #ffffff;
+            --card-border: #e6e6e6;
+            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.8);
         }
 
         * {
@@ -34,18 +38,77 @@
         }
 
         body {
-            font-family: -apple-system, "Microsoft JhengHei", "微軟正黑體", sans-serif;
-            background: linear-gradient(
-                var(--gradient-angle),
-                var(--bg-primary),
-                var(--bg-secondary),
-                var(--bg-primary)
-            );
-            animation: gradient-rotation 20s linear infinite;
+            font-family: 'Inter', -apple-system, "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background: var(--bg-secondary);
+            background-image:
+                radial-gradient(circle at 100% 0%, rgba(0, 102, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(0, 102, 255, 0.03) 0%, transparent 50%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 20px;
+            padding: 1rem;
+        }
+
+        .dashboard-card {
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.05),
+                0 0 0 1px var(--card-border);
+        }
+
+        .dashboard-card::before,
+        .dashboard-card::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            opacity: 0.05;
+            z-index: 0;
+        }
+
+        .dashboard-card::before {
+            width: 300px;
+            height: 300px;
+            top: -150px;
+            right: -150px;
+        }
+
+        .dashboard-card::after {
+            width: 200px;
+            height: 200px;
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .dashboard-header,
+        .categories,
+        .news-grid {
+            position: relative;
+            z-index: 1;
+        }
+
+        .global-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 1000;
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .container {
@@ -73,44 +136,52 @@
 
         .categories {
             display: flex;
-            gap: 12px;
-            margin-top: 24px;
-            padding: 0 12px;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            padding: 0.5rem;
             overflow-x: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            background: var(--bg-secondary);
+            border-radius: 30px;
+            position: relative;
+        }
+
+        .categories::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--bg-secondary));
+            pointer-events: none;
         }
 
         .categories::-webkit-scrollbar {
             display: none;
         }
 
-        .category {
-            padding: 8px 20px;
-            border-radius: 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
+        .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            border: none;
             color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            user-select: none;
-        }
-
-        .category.active {
-            background: linear-gradient(
-                45deg,
-                var(--accent-primary),
-                var(--accent-secondary)
-            );
-            border-color: transparent;
-            color: var(--bg-primary);
             font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
-        .category:not(.active):hover {
-            border-color: var(--accent-primary);
-            color: var(--text-primary);
+        .nav-link.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .nav-link:not(.active):hover {
+            background: var(--bg-primary);
+            color: var(--accent-primary);
         }
 
         header::after {
@@ -129,17 +200,32 @@
             );
         }
 
-        h1 {
-            font-size: 32px;
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 800;
             background: linear-gradient(
-                45deg,
-                var(--accent-primary),
-                var(--accent-secondary)
+                135deg,
+                var(--text-primary) 0%,
+                var(--accent-primary) 50%,
+                var(--accent-secondary) 100%
             );
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 40%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), transparent);
+            border-radius: 2px;
         }
 
         #last-update {
@@ -151,18 +237,19 @@
             border: 1px solid var(--card-border);
         }
 
-        .news-container {
+        .news-grid {
             display: grid;
-            gap: 24px;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         }
 
         .news-item {
             background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 12px;
+            padding: 1.5rem;
             border: 1px solid var(--card-border);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
             position: relative;
             overflow: hidden;
         }
@@ -172,25 +259,36 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                var(--accent-primary),
-                var(--accent-secondary),
-                transparent
-            );
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .news-item:hover {
-            transform: translateY(-4px);
-            border-color: transparent;
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.1),
-                0 1px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .news-item:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading {
+            background: linear-gradient(
+                90deg,
+                var(--bg-secondary),
+                var(--card-bg),
+                var(--bg-secondary)
+            );
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite linear;
         }
 
         .news-item:hover::before {
@@ -198,25 +296,28 @@
         }
 
         .news-item h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
             color: var(--text-primary);
             line-height: 1.4;
+            font-weight: 600;
+            letter-spacing: -0.3px;
         }
 
         .news-item p {
-            font-size: 16px;
+            font-size: 0.9375rem;
             color: var(--text-secondary);
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
             line-height: 1.6;
+            letter-spacing: -0.1px;
         }
 
         .news-item .source {
-            font-size: 14px;
+            font-size: 0.875rem;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
         .news-item a {
@@ -251,64 +352,81 @@
 
         .loading {
             text-align: center;
-            padding: 60px;
-            font-size: 18px;
+            padding: 3rem;
             color: var(--text-secondary);
-            background: var(--card-bg);
-            border-radius: 16px;
-            border: 1px solid var(--card-border);
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .loading::before {
+            content: '';
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid var(--accent-primary);
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .error {
-            background: rgba(255, 59, 48, 0.1);
-            color: #ff3b30;
-            padding: 20px;
-            border-radius: 16px;
-            margin: 20px 0;
+            background: #fff2f2;
+            color: #ff4444;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
             text-align: center;
-            border: 1px solid rgba(255, 59, 48, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid #ffe6e6;
+            font-size: 0.875rem;
         }
 
         @media (max-width: 768px) {
             body {
-                padding: 16px;
+                padding: 1rem;
             }
             
-            .container {
-                padding: 20px;
+            .dashboard-card {
+                padding: 1.5rem;
             }
 
-            h1 {
-                font-size: 24px;
+            .dashboard-title {
+                font-size: 1.5rem;
             }
 
-            .news-container {
+            .news-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-top">
-                <h1>香港最新新聞</h1>
-                <div id="last-update"></div>
+    <main class="main-content">
+        <div class="dashboard-card">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">香港最新消息</h1>
+                <div id="last-update" style="color: var(--text-secondary); font-size: 0.875rem; background: var(--bg-secondary); padding: 0.5rem 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;"></div>
             </div>
-            <div class="categories">
-                <div class="category active" data-category="熱門">熱門新聞</div>
-                <div class="category" data-category="科技">科技</div>
-                <div class="category" data-category="娛樂">娛樂</div>
-                <div class="category" data-category="商業">商業</div>
-                <div class="category" data-category="體育">體育</div>
-                <div class="category" data-category="生活">生活</div>
+            
+            <div class="categories" style="margin-bottom: 1.5rem;">
+                <button class="nav-link active" data-category="熱門">全部新聞</button>
+                <button class="nav-link" data-category="科技">科技新聞</button>
+                <button class="nav-link" data-category="商業">商業新聞</button>
+                <button class="nav-link" data-category="體育">體育新聞</button>
             </div>
-        </header>
-        <div id="news-container" class="news-container">
-            <div class="loading">載入中...</div>
+
+            <div id="news-container" class="news-grid">
+                <!-- News items will be inserted here -->
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         const newsContainer = document.getElementById('news-container');
@@ -336,21 +454,21 @@
                 );
                 
                 if (!response.ok) {
-                    throw new Error('網絡請求失敗');
+                    throw new Error('網路連線失敗');
                 }
                 
                 const rawData = await response.json();
                 if (!rawData.contents) {
-                    throw new Error('無法獲取新聞內容');
+                    throw new Error('無法取得新聞內容');
                 }
                 
                 const data = JSON.parse(rawData.contents);
                 if (data.status === 'error') {
-                    throw new Error(data.message || '新聞API錯誤');
+                    throw new Error(data.message || '新聞系統發生錯誤');
                 }
                 
                 if (!data.articles || data.articles.length === 0) {
-                    throw new Error('沒有找到相關新聞');
+                    throw new Error('目前沒有相關新聞');
                 }
                 
                 return data.articles;
@@ -376,8 +494,8 @@
                     <h2>${article.title}</h2>
                     ${article.description ? `<p>${article.description}</p>` : ''}
                     <div class="source">
-                        來源: ${article.source.name || '未知'} | 
-                        <a href="${article.url}" target="_blank" rel="noopener noreferrer">閱讀更多</a>
+                        來源:${article.source.name || '未知'} |
+                        <a href="${article.url}" target="_blank" rel="noopener noreferrer">查看完整內容</a>
                     </div>
                 </div>
             `).join('');
@@ -395,15 +513,15 @@
 
         // Category selection
         document.querySelector('.categories').addEventListener('click', async (e) => {
-            const categoryEl = e.target.closest('.category');
-            if (!categoryEl || categoryEl.classList.contains('active')) return;
+            const button = e.target.closest('.nav-link');
+            if (!button || button.classList.contains('active')) return;
 
             // Update active state
-            document.querySelector('.category.active').classList.remove('active');
-            categoryEl.classList.add('active');
+            document.querySelector('.nav-link.active').classList.remove('active');
+            button.classList.add('active');
 
             // Update category and fetch news
-            currentCategory = categoryEl.dataset.category;
+            currentCategory = button.dataset.category;
             newsContainer.innerHTML = '<div class="loading">載入中...</div>';
             await updateNews();
         });
